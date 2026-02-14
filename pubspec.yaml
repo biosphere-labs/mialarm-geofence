@@ -1,0 +1,46 @@
+name: mialarm_clone
+description: miAlarm clone with geofencing auto-arm feature
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.5.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Firebase
+  firebase_core: ^3.8.0
+  firebase_auth: ^5.4.0
+  cloud_firestore: ^5.6.0
+  firebase_messaging: ^15.2.0
+
+  # State Management
+  flutter_riverpod: ^2.6.1
+  riverpod_annotation: ^2.6.1
+
+  # Navigation
+  go_router: ^14.7.0
+
+  # Location & Maps
+  geolocator: ^13.0.2
+  google_maps_flutter: ^2.10.0
+
+  # Notifications
+  flutter_local_notifications: ^18.0.1
+
+  # Utilities
+  intl: ^0.20.1
+  collection: ^1.19.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  riverpod_generator: ^2.6.3
+  build_runner: ^2.4.14
+  json_serializable: ^6.9.4
+
+flutter:
+  uses-material-design: true
