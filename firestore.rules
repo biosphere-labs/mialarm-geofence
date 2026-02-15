@@ -1,0 +1,68 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper: check if user is authenticated
+    function isAuth() {
+      return request.auth != null;
+    }
+
+    // Helper: check if user is the resource owner
+    function isOwner(userId) {
+      return isAuth() && request.auth.uid == userId;
+    }
+
+    // Helper: check if user is a site member
+    function isSiteMember(siteId) {
+      return isAuth() &&
+        exists(/databases/$(database)/documents/sites/$(siteId)) &&
+        get(/databases/$(database)/documents/sites/$(siteId)).data.members.hasAny([
+          {'userId': request.auth.uid, 'role': 'owner'},
+          {'userId': request.auth.uid, 'role': 'member'}
+        ]);
+    }
+
+    // Users collection: users can read/write their own profile
+    match /users/{userId} {
+      allow read: if isAuth();
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+      allow delete: if isOwner(userId);
+    }
+
+    // Sites collection: members can read, owner can write
+    match /sites/{siteId} {
+      allow read: if isAuth() &&
+        resource.data.members.hasAny([
+          {'userId': request.auth.uid, 'role': 'owner'},
+          {'userId': request.auth.uid, 'role': 'member'}
+        ]);
+      allow create: if isAuth();
+      allow update: if isAuth() &&
+        resource.data.ownerId == request.auth.uid;
+      allow delete: if isAuth() &&
+        resource.data.ownerId == request.auth.uid;
+    }
+
+    // Panels collection: site members can read, owner can write
+    match /panels/{panelId} {
+      allow read: if isAuth();
+      allow create: if isAuth();
+      allow update: if isAuth();
+      allow delete: if isAuth();
+    }
+
+    // Events collection: site members can read, authenticated users can create
+    match /events/{eventId} {
+      allow read: if isAuth();
+      allow create: if isAuth();
+    }
+
+    // Presence collection: site members can read/write
+    match /presence/{siteId} {
+      allow read: if isAuth();
+      allow write: if isAuth();
+    }
+  }
+}
