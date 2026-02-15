@@ -8,52 +8,9 @@ import '../../providers/panel_provider.dart';
 import '../../services/firestore_service.dart';
 import '../../utils/theme.dart';
 import '../../widgets/event_tile.dart';
+import '../../widgets/status_indicator.dart';
 import 'partition_card.dart';
 import 'output_button.dart';
-
-// ═══════════════════════════════════════════════════════════════════
-// TASK 2: Dashboard Screen                                ~45 min
-// ═══════════════════════════════════════════════════════════════════
-//
-// WHAT YOU'LL LEARN:
-//   - ConsumerWidget (Riverpod's version of a widget that reads state)
-//   - How to use ref.watch() to subscribe to providers
-//   - AsyncValue.when() for handling loading/error/data states
-//   - Flutter layout: Column, Row, Expanded, ListView
-//   - Widget composition: building a screen from smaller widgets
-//
-// REFERENCE: Look at event_history_screen.dart to see how it:
-//   - Watches a provider with ref.watch()
-//   - Handles the AsyncValue with .when()
-//   - Builds a list from stream data
-//
-// REQUIREMENTS:
-//   1. Show site name + connection status at the top
-//   2. Render a PartitionCard for each partition (widget provided)
-//   3. Render OutputButton for each output (your Task 3)
-//   4. Show last 5 events at the bottom using EventTile (provided)
-//   5. Handle loading and error states
-//
-// DATA FLOW:
-//   ref.watch(primarySiteProvider) → get the site
-//   From site → get panelId (use firestoreService.getPanelForSite)
-//   ref.watch(panelStreamProvider(panelId)) → real-time panel data
-//   ref.watch(panelEventsProvider(panelId)) → recent events
-//
-// NOTE: You need to complete Task 4 (panel_provider.dart) first,
-//   OR you can temporarily use the FirestoreService directly with
-//   StreamBuilder (like event_history_screen.dart does) and swap
-//   to providers later.
-//
-// LAYOUT GUIDE:
-//   Scaffold
-//     AppBar (site name, connection indicator)
-//     body: SingleChildScrollView or ListView
-//       - Section: Partitions (PartitionCard for each)
-//       - Section: Quick Controls (Row of OutputButtons)
-//       - Section: Recent Activity (last 5 EventTiles)
-//
-// ═══════════════════════════════════════════════════════════════════
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -64,9 +21,26 @@ class DashboardScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('miAlarm'),
-        // TODO: Show site name from siteAsync data
-        // TODO: Add connection status indicator in actions
+        title: siteAsync.when(
+          data: (site) => Text(site?.name ?? 'miAlarm'),
+          loading: () => const Text('miAlarm'),
+          error: (_, __) => const Text('miAlarm'),
+        ),
+        actions: [
+          siteAsync.when(
+            data: (site) => Padding(
+              padding: const EdgeInsets.only(right: 16),
+              child: StatusIndicator(
+                color: site != null ? AppColors.armed : AppColors.textMuted,
+              ),
+            ),
+            loading: () => const SizedBox.shrink(),
+            error: (_, __) => const Padding(
+              padding: EdgeInsets.only(right: 16),
+              child: StatusIndicator(color: AppColors.disarmed),
+            ),
+          ),
+        ],
       ),
       body: siteAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -76,27 +50,134 @@ class DashboardScreen extends ConsumerWidget {
             return const Center(child: Text('No site configured'));
           }
 
-          // TODO: Get the panel for this site and build the dashboard
-          //
-          // Use FutureBuilder with firestoreService.getPanelForSite(site.id)
-          // to get the panelId, then use StreamBuilder or providers to
-          // stream the panel data.
-          //
-          // See event_history_screen.dart for this exact pattern.
+          final firestoreService = ref.read(firestoreServiceProvider);
 
-          return const Center(
-            child: Text('TODO: Build dashboard content'),
+          return FutureBuilder(
+            future: firestoreService.getPanelForSite(site.id),
+            builder: (context, panelSnap) {
+              if (panelSnap.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              if (panelSnap.data == null) {
+                return const Center(child: Text('No panel found'));
+              }
+
+              final panelId = panelSnap.data!.id;
+              return _DashboardContent(panelId: panelId);
+            },
           );
         },
       ),
     );
   }
+}
 
-  // HINT: You'll probably want helper methods like:
-  //
-  // Widget _buildPartitions(Panel panel, String userId) { ... }
-  // Widget _buildOutputs(Panel panel, String userId) { ... }
-  // Widget _buildRecentEvents(List<PanelEvent> events) { ... }
-  //
-  // Each section can be a Column with a header Text and the widgets.
+class _DashboardContent extends ConsumerWidget {
+  final String panelId;
+  const _DashboardContent({required this.panelId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final panelAsync = ref.watch(panelStreamProvider(panelId));
+    final eventsAsync = ref.watch(panelEventsProvider(panelId));
+    final userId = ref.watch(currentUserIdProvider) ?? '';
+    final firestoreService = ref.read(firestoreServiceProvider);
+
+    return panelAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => Center(child: Text('Error: $e')),
+      data: (panel) {
+        return SingleChildScrollView(
+          padding: const EdgeInsets.only(bottom: 32),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Partitions
+              for (final partition in panel.partitions)
+                PartitionCard(
+                  partition: partition,
+                  hasOpenZones: ref.watch(
+                    hasOpenZonesProvider((panelId, partition.id)),
+                  ),
+                  panelConnected: panel.connected,
+                  onStateChange: (state) => firestoreService
+                      .setPartitionState(panelId, partition.id, state, userId),
+                ),
+
+              // Outputs
+              if (panel.outputs.isNotEmpty) ...[
+                const Padding(
+                  padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
+                  child: Text(
+                    'Quick Controls',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: panel.outputs
+                        .map((output) => OutputButton(
+                              output: output,
+                              panelConnected: panel.connected,
+                              onTrigger: () => firestoreService.triggerOutput(
+                                  panelId, output.id, userId),
+                            ))
+                        .toList(),
+                  ),
+                ),
+              ],
+
+              // Recent events
+              const Padding(
+                padding: EdgeInsets.fromLTRB(16, 24, 16, 8),
+                child: Text(
+                  'Recent Activity',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ),
+              eventsAsync.when(
+                loading: () => const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(16),
+                    child: CircularProgressIndicator(),
+                  ),
+                ),
+                error: (e, _) => Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Text('Error loading events: $e'),
+                ),
+                data: (events) {
+                  final recent = events.take(5).toList();
+                  if (recent.isEmpty) {
+                    return Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Text(
+                        'No events yet',
+                        style: TextStyle(color: AppColors.textMuted),
+                      ),
+                    );
+                  }
+                  return Column(
+                    children: recent
+                        .map((event) => EventTile(event: event))
+                        .toList(),
+                  );
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 }

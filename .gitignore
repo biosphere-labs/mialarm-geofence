@@ -9,6 +9,7 @@ build/
 # Firebase
 firebase_options.dart
 functions/node_modules/
+android/app/google-services.json
 
 # IDE
 .idea/
@@ -21,3 +22,10 @@ Thumbs.db
 
 # Misc
 .env
+
+# Generated
+android/local.properties
+analysis_options.yaml
+
+# Workflow archives (optional - uncomment to ignore)
+# workflow/**/.archived/

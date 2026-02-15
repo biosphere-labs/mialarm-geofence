@@ -4,42 +4,6 @@ import 'package:go_router/go_router.dart';
 import '../../providers/auth_provider.dart';
 import '../../utils/theme.dart';
 
-// ═══════════════════════════════════════════════════════════════════
-// TASK 1: Login Screen                                    ~30 min
-// ═══════════════════════════════════════════════════════════════════
-//
-// WHAT YOU'LL LEARN:
-//   - StatefulWidget vs StatelessWidget (and when to use which)
-//   - TextEditingController for form fields
-//   - Form validation with GlobalKey<FormState>
-//   - Async operations in UI (loading state, error handling)
-//   - Navigation with GoRouter
-//
-// REFERENCE: Look at register_screen.dart — it's the same pattern
-//   but with an extra field. Your login screen is simpler.
-//
-// REQUIREMENTS:
-//   1. Email field with validation (non-empty, contains @)
-//   2. Password field with validation (non-empty, min 6 chars)
-//   3. "Sign In" button that:
-//      - Validates the form
-//      - Shows a loading spinner while authenticating
-//      - Calls authService.signIn(email, password)
-//      - Shows error in a SnackBar if auth fails
-//      - On success: GoRouter's redirect handles navigation (you
-//        don't need to manually navigate)
-//   4. Link to register page: context.go('/register')
-//   5. App icon/title at the top for branding
-//
-// HINTS:
-//   - Use ConsumerStatefulWidget (not StatefulWidget) because you
-//     need ref.read(authServiceProvider) for the auth call
-//   - Remember to dispose() your TextEditingControllers
-//   - The loading state is local to this widget (use setState)
-//   - Look at how register_screen.dart handles the try/catch
-//
-// ═══════════════════════════════════════════════════════════════════
-
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
@@ -48,44 +12,127 @@ class LoginScreen extends ConsumerStatefulWidget {
 }
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
-  // TODO: Create form key, controllers, loading state
+  final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  bool _loading = false;
 
   @override
   void dispose() {
-    // TODO: Dispose controllers
+    _emailController.dispose();
+    _passwordController.dispose();
     super.dispose();
   }
 
   Future<void> _signIn() async {
-    // TODO: Implement sign in
-    // 1. Validate form
-    // 2. Set loading = true
-    // 3. Call authService.signIn()
-    // 4. Catch errors → show SnackBar
-    // 5. Set loading = false in finally block
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _loading = true);
+
+    try {
+      final authService = ref.read(authServiceProvider);
+      await authService.signIn(
+        _emailController.text.trim(),
+        _passwordController.text,
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString()),
+            backgroundColor: AppColors.alert,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    // TODO: Build the login form UI
-    //
-    // Structure should be:
-    //   Scaffold
-    //     SafeArea
-    //       Center
-    //         SingleChildScrollView  (prevents keyboard overflow)
-    //           Form
-    //             Column
-    //               Icon (Icons.security, size 64)
-    //               Text "miAlarm"
-    //               TextFormField (email)
-    //               TextFormField (password, obscureText: true)
-    //               ElevatedButton (Sign In / loading spinner)
-    //               TextButton (link to register)
+    return Scaffold(
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(32),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const Icon(
+                    Icons.security,
+                    size: 64,
+                    color: AppColors.primary,
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'miAlarm',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 32),
 
-    return const Scaffold(
-      body: Center(
-        child: Text('TODO: Build login screen'),
+                  TextFormField(
+                    controller: _emailController,
+                    decoration: const InputDecoration(
+                      labelText: 'Email',
+                      prefixIcon: Icon(Icons.email_outlined),
+                    ),
+                    keyboardType: TextInputType.emailAddress,
+                    validator: (v) {
+                      if (v == null || v.trim().isEmpty) return 'Email required';
+                      if (!v.contains('@')) return 'Invalid email';
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+
+                  TextFormField(
+                    controller: _passwordController,
+                    decoration: const InputDecoration(
+                      labelText: 'Password',
+                      prefixIcon: Icon(Icons.lock_outline),
+                    ),
+                    obscureText: true,
+                    validator: (v) {
+                      if (v == null || v.isEmpty) return 'Password required';
+                      if (v.length < 6) return 'Minimum 6 characters';
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 24),
+
+                  ElevatedButton(
+                    onPressed: _loading ? null : _signIn,
+                    child: _loading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Text('Sign In'),
+                  ),
+                  const SizedBox(height: 16),
+
+                  TextButton(
+                    onPressed: () => context.go('/register'),
+                    child: const Text("Don't have an account? Register"),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

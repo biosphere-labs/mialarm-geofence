@@ -1,4 +1,4 @@
-name: mialarm_clone
+name: mialarm_geofence
 description: miAlarm clone with geofencing auto-arm feature
 publish_to: 'none'
 version: 1.0.0+1

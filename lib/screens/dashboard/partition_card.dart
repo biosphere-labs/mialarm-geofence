@@ -87,7 +87,6 @@ class _PartitionCardState extends State<PartitionCard> {
                   children: [
                     StatusIndicator(
                       color: stateColor,
-                      tooltip: widget.partition.displayState,
                     ),
                     const SizedBox(width: 8),
                     Text(
