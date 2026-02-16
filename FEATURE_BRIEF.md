@@ -63,9 +63,9 @@ The system tracks all family members' presence. It only arms when the **last per
 |---------|-----|-----------|
 | **Ajax** | Ajax PRO | Yes — geofence reminders for arming/disarming |
 | **IDS** | hyyp+ | Not documented in official sources |
-| **Finmon** | miAlarm | **No** — manual arm/disarm only |
+| **Finmon** | miAlarm | **No** — location used only for emergency GPS sharing ([source](https://www.finmon.co.za/kb/books/mialarm-app/page/advanced-configuration)) |
 
-Ajax Systems' app includes a documented geofence function that sends reminders when leaving/entering a user-defined area. Finmon's miAlarm offers manual arm/disarm from the app, but the market is moving toward location-aware automation.
+Notably, miAlarm already requests location permission from the user — but only for emergency GPS sharing during alarm events. Their documentation explicitly states "No background location tracking" ([FAQ](https://www.finmon.co.za/kb/books/mialarm-app/page/faq)). This means the infrastructure for location access exists, but it's not used for automation. Geofence auto-arm would be a natural opt-in extension: users who want it can enable location-based arming, while others keep the existing manual workflow. Ajax Systems' app already includes a documented geofence function that sends reminders when leaving/entering a user-defined area.
 
 ### South African Context
 
