@@ -5,7 +5,7 @@
 | Item | Status | Details |
 |------|--------|---------|
 | Firebase project created | Done | `mialarm-geofence-demo` |
-| Android app registered | Done | `com.finmon.mialarm_geofence` |
+| Android app registered | Done | `[app package name]` |
 | google-services.json | Done | Downloaded and placed in `android/app/` |
 | Firestore database | Done | `(default)` in `nam5` (US multi-region) |
 | Firestore security rules | Done | Deployed - auth-required for all collections |

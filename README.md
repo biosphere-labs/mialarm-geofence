@@ -14,7 +14,7 @@ miAlarm already requests location permission for emergency GPS sharing but doesn
 - Multi-user presence tracking: only arms when the *last* person leaves
 - Push notification prompts for security-sensitive actions
 
-Backed by Firebase (Auth, Firestore, Cloud Functions, FCM) simulating a real alarm panel. The architecture mirrors production — swapping the simulated backend for the real Finmon API would be a single service layer change.
+Backed by Firebase (Auth, Firestore, Cloud Functions, FCM) simulating a real alarm panel. The architecture mirrors production — swapping the simulated backend for the real real alarm monitoring API would be a single service layer change.
 
 > **Note:** The geofence configuration UI is fully functional, and the underlying monitoring service and Cloud Function are implemented, but the backend service is **not yet wired up** — monitoring is not started automatically and notifications are not triggered. See [GEOFENCE_IMPLEMENTATION.md](GEOFENCE_IMPLEMENTATION.md) for the implementation plan (~70 lines of code to complete).
 

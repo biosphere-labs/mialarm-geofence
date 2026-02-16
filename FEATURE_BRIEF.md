@@ -2,11 +2,11 @@
 
 ## What This Is
 
-A functional Flutter clone of Finmon's **miAlarm** app with an added **geofencing auto-arm/disarm** feature — a capability that competitors like Ajax already offer but miAlarm currently lacks. Select sections were intentionally implemented by hand as a Flutter learning exercise.
+A functional Flutter clone of the **miAlarm** app with an added **geofencing auto-arm/disarm** feature — a capability that competitors like Ajax already offer but miAlarm currently lacks. Select sections were intentionally implemented by hand as a Flutter learning exercise.
 
 ## The App
 
-This is a working mobile application backed by Firebase that simulates a Finmon alarm panel. It replicates miAlarm's core functionality:
+This is a working mobile application backed by Firebase that simulates an alarm panel. It replicates miAlarm's core functionality:
 
 - **Arm/Disarm partitions** (House, Perimeter) with Home Arm and Sleep Arm modes
 - **Output control** — open/close gates and garage doors, toggle lights, geyser, pool pump
@@ -17,7 +17,7 @@ This is a working mobile application backed by Firebase that simulates a Finmon 
 
 ## How It Works Without Hardware
 
-The app connects to a Firebase backend that simulates panel state. The architecture is identical to what a production integration would look like — the only difference is the last hop. Instead of `Firestore → Cloud Function → Finmon API → Physical Panel`, the Cloud Function updates simulated state in Firestore directly. Swapping in the real Finmon API would be a single service layer change.
+The app connects to a Firebase backend that simulates panel state. The architecture is identical to what a production integration would look like — the only difference is the last hop. Instead of `Firestore → Cloud Function → real monitoring API → Physical Panel`, the Cloud Function updates simulated state in Firestore directly. Swapping in the real real monitoring API would be a single service layer change.
 
 ```
 Flutter App → Firebase Auth + Firestore → Cloud Functions → Simulated Panel State
@@ -63,15 +63,15 @@ The system tracks all family members' presence. It only arms when the **last per
 |---------|-----|-----------|
 | **Ajax** | Ajax PRO | Yes — geofence reminders for arming/disarming |
 | **IDS** | hyyp+ | Not documented in official sources |
-| **Finmon** | miAlarm | **No** — location used only for emergency GPS sharing ([source](https://www.finmon.co.za/kb/books/mialarm-app/page/advanced-configuration)) |
+| **miAlarm** | miAlarm | **No** — location used only for emergency GPS sharing (per official app documentation) |
 
-Notably, miAlarm already requests location permission from the user — but only for emergency GPS sharing during alarm events. Their documentation explicitly states "No background location tracking" ([FAQ](https://www.finmon.co.za/kb/books/mialarm-app/page/faq)). This means the infrastructure for location access exists, but it's not used for automation. Geofence auto-arm would be a natural opt-in extension: users who want it can enable location-based arming, while others keep the existing manual workflow. Ajax Systems' app already includes a documented geofence function that sends reminders when leaving/entering a user-defined area.
+Notably, miAlarm already requests location permission from the user — but only for emergency GPS sharing during alarm events. The official documentation explicitly states "No background location tracking". This means the infrastructure for location access exists, but it's not used for automation. Geofence auto-arm would be a natural opt-in extension: users who want it can enable location-based arming, while others keep the existing manual workflow. Ajax Systems' app already includes a documented geofence function that sends reminders when leaving/entering a user-defined area.
 
 ### South African Context
 
 South Africa has one of the highest private security adoption rates in the world. Armed response is a multi-billion rand industry. False alarms from late disarms are a real operational cost — security companies charge R500+ per unnecessary callout. Automated arming eliminates forgotten-to-arm scenarios entirely.
 
-### Business Value for Finmon
+### Business Value
 
 - **Reduced false alarms** → Lower operational cost for monitoring partners
 - **Increased app engagement** → Users interact with the app more when it's proactive

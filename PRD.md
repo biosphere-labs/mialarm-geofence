@@ -2,11 +2,11 @@
 
 ## Project Overview
 
-A functional Flutter clone of Finmon's **miAlarm** app with an added **geofencing auto-arm/disarm** feature that their competitors offer but they currently lack. Built as a portfolio/interview demonstration piece with a Firebase backend simulating panel state.
+A functional Flutter clone of the **miAlarm** app with an added **geofencing auto-arm/disarm** feature that their competitors offer but they currently lack. Built as a portfolio/interview demonstration piece with a Firebase backend simulating panel state.
 
-**Target company**: Finmon (PTY) LTD - South African alarm monitoring communications company
-**Their stack**: Flutter (mentioned in job listing)
-**Their apps**: miAlarm (consumer), finMonitor (control room), finmonTech (technician)
+**Target**: South African alarm monitoring communications company
+**Stack**: Flutter
+**Apps**: miAlarm (consumer), monitoring dashboard (control room), technician app
 
 ---
 
@@ -66,7 +66,7 @@ You'll see three state management approaches discussed in Flutter circles. Here'
 
 - **Provider** is the predecessor. Riverpod fixes its limitations (no BuildContext dependency, better testing, compile-safe).
 - **BLoC** is powerful but ceremony-heavy. For an app this size, the boilerplate overhead isn't justified.
-- **Riverpod** is the current community recommendation. It's what you'd reach for on a new project in 2026. If Finmon asks "why Riverpod?" you have a clear answer.
+- **Riverpod** is the current community recommendation. It's what you'd reach for on a new project in 2026. If asked "why Riverpod?" you have a clear answer.
 
 ---
 
@@ -787,7 +787,7 @@ dart pub global activate flutterfire_cli
 ### Setup Steps
 ```bash
 # 1. Create the Flutter project
-flutter create --org za.co.finmon mialarm_clone
+flutter create --org com.example mialarm_clone
 cd mialarm_clone
 
 # 2. Add dependencies
@@ -841,7 +841,7 @@ After building this, you should be able to discuss:
 
 6. **"Why not auto-disarm?"** - Security principle: lowering security should always require human confirmation. Auto-arm (raising security) is safe to automate.
 
-7. **"How would you plug this into the real Finmon API?"** - Replace FirestoreService with an HTTP client. The provider layer stays the same. This is the benefit of the service abstraction.
+7. **"How would you plug this into the real monitoring API?"** - Replace FirestoreService with an HTTP client. The provider layer stays the same. This is the benefit of the service abstraction.
 
 ---
 

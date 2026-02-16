@@ -118,7 +118,7 @@ class _GeofenceScreenState extends ConsumerState<GeofenceScreen> {
                 children: [
                   TileLayer(
                     urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                    userAgentPackageName: 'com.finmon.mialarm_geofence',
+                    userAgentPackageName: 'com.example.mialarm_geofence',
                   ),
                   CircleLayer(
                     circles: [
