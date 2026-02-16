@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:latlong2/latlong.dart';
 import '../../models/site.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/geofence_provider.dart';
@@ -103,42 +105,56 @@ class _GeofenceScreenState extends ConsumerState<GeofenceScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Map placeholder
-          Container(
-            height: 200,
-            decoration: BoxDecoration(
-              color: AppColors.card,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.textMuted.withValues(alpha: 0.3)),
-            ),
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+          // Map with geofence circle (OpenStreetMap — no API key needed)
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: SizedBox(
+              height: 250,
+              child: FlutterMap(
+                options: MapOptions(
+                  initialCenter: LatLng(site.geofence.latitude, site.geofence.longitude),
+                  initialZoom: 16,
+                ),
                 children: [
-                  Icon(Icons.map, size: 48, color: AppColors.textMuted),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Map view',
-                    style: TextStyle(color: AppColors.textMuted),
+                  TileLayer(
+                    urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                    userAgentPackageName: 'com.finmon.mialarm_geofence',
                   ),
-                  Text(
-                    '${site.geofence.latitude.toStringAsFixed(4)}, '
-                    '${site.geofence.longitude.toStringAsFixed(4)}',
-                    style: TextStyle(
-                      color: AppColors.textMuted,
-                      fontSize: 12,
-                    ),
+                  CircleLayer(
+                    circles: [
+                      CircleMarker(
+                        point: LatLng(site.geofence.latitude, site.geofence.longitude),
+                        radius: _radius,
+                        useRadiusInMeter: true,
+                        color: AppColors.primary.withOpacity(0.15),
+                        borderColor: AppColors.primary,
+                        borderStrokeWidth: 3,
+                      ),
+                    ],
                   ),
-                  Text(
-                    'Radius: ${_radius.round()}m',
-                    style: TextStyle(
-                      color: AppColors.accent,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  MarkerLayer(
+                    markers: [
+                      Marker(
+                        point: LatLng(site.geofence.latitude, site.geofence.longitude),
+                        width: 40,
+                        height: 40,
+                        child: const Icon(
+                          Icons.location_on,
+                          color: Colors.red,
+                          size: 40,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Center: ${site.geofence.latitude.toStringAsFixed(4)}, '
+            '${site.geofence.longitude.toStringAsFixed(4)}',
+            style: TextStyle(color: AppColors.textMuted, fontSize: 12),
           ),
           const SizedBox(height: 24),
 

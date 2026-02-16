@@ -48,6 +48,47 @@ flutter run
 
 After first login, go to Settings and tap "Seed Demo Data" to populate the database.
 
+## Testing
+
+### Unit Tests
+
+42 tests covering models and constants:
+
+```bash
+flutter test
+```
+
+Tests cover:
+- `Site`, `GeofenceConfig`, `SiteMember` — serialization, defaults, copyWith
+- `Panel`, `Partition`, `Zone`, `Output` — computed properties (`isArmed`, `displayState`, `isOpen`, `isBypassed`, `isOn`, `isMomentary`), fromMap/toMap roundtrips
+- `PanelEvent` — icon mapping, `isAlert` logic, default values
+- Constants — collection names, arm states, zone states, event types, geofence defaults
+
+### Running on Device / Emulator
+
+```bash
+# List available emulators
+emulator -list-avds
+
+# Start emulator
+emulator -avd <avd_name> &
+
+# Run app on connected device or emulator
+flutter run
+
+# Or build and install the APK directly
+flutter build apk --debug
+adb install build/app/outputs/flutter-apk/app-debug.apk
+```
+
+### First Run Checklist
+
+1. Register a new account (or log in if you already have one)
+2. Go to **Settings** (gear icon) → tap **"Seed Demo Data"**
+3. Return to **Home** — you should see the panel with partitions, zones, and outputs
+4. Check **Events** tab for sample event history
+5. Check **Geofence** tab for the map view with geofence circle
+
 ## Architecture
 
 ```

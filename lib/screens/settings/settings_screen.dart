@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:geolocator/geolocator.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/seed_service.dart';
 import '../../utils/theme.dart';
@@ -30,16 +31,44 @@ class SettingsScreen extends ConsumerWidget {
           ListTile(
             leading: const Icon(Icons.dataset),
             title: const Text('Seed Demo Data'),
-            subtitle: const Text('Populate database with sample data'),
+            subtitle: const Text('Uses your current GPS location for geofence'),
             onTap: () async {
               final userId = user?.uid;
               if (userId == null) return;
 
               try {
-                await SeedService().seedDemoData(userId: userId);
+                // Get current location for realistic geofence placement
+                double lat = -26.2041; // Johannesburg fallback
+                double lng = 28.0473;
+
+                try {
+                  LocationPermission permission = await Geolocator.checkPermission();
+                  if (permission == LocationPermission.denied) {
+                    permission = await Geolocator.requestPermission();
+                  }
+                  if (permission == LocationPermission.whileInUse ||
+                      permission == LocationPermission.always) {
+                    final pos = await Geolocator.getCurrentPosition(
+                      locationSettings: const LocationSettings(
+                        accuracy: LocationAccuracy.high,
+                        timeLimit: Duration(seconds: 10),
+                      ),
+                    );
+                    lat = pos.latitude;
+                    lng = pos.longitude;
+                  }
+                } catch (_) {
+                  // Fall back to defaults if location unavailable
+                }
+
+                await SeedService().seedDemoData(
+                  userId: userId,
+                  latitude: lat,
+                  longitude: lng,
+                );
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Demo data seeded')),
+                    const SnackBar(content: Text('Demo data seeded with your location')),
                   );
                 }
               } catch (e) {

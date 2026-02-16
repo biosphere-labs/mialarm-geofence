@@ -45,10 +45,11 @@ service cloud.firestore {
       allow delete: if isAuth();
     }
 
-    // Events collection: authenticated users can read/create
+    // Events collection: authenticated users can read/write
     match /events/{eventId} {
       allow read: if isAuth();
       allow create: if isAuth();
+      allow delete: if isAuth();
     }
 
     // Presence collection: authenticated users can read/write
