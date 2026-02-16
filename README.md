@@ -16,6 +16,8 @@ miAlarm already requests location permission for emergency GPS sharing but doesn
 
 Backed by Firebase (Auth, Firestore, Cloud Functions, FCM) simulating a real alarm panel. The architecture mirrors production — swapping the simulated backend for the real Finmon API would be a single service layer change.
 
+> **Note:** The geofence configuration UI is fully functional, and the underlying monitoring service and Cloud Function are implemented, but the backend service is **not yet wired up** — monitoring is not started automatically and notifications are not triggered. See [GEOFENCE_IMPLEMENTATION.md](GEOFENCE_IMPLEMENTATION.md) for the implementation plan (~70 lines of code to complete).
+
 ## Hand-Built Sections
 
 Parts of this app were built by hand as a Flutter learning exercise. Scaffold and complex integrations were provided; core UI, state management, and widget composition were implemented manually.
@@ -27,6 +29,10 @@ Parts of this app were built by hand as a Flutter learning exercise. Scaffold an
 | Output button | `lib/screens/dashboard/output_button.dart` | Reusable widgets, callbacks, optimistic UI | ~30 min |
 | Panel provider | `lib/providers/panel_provider.dart` | Riverpod StreamProvider, derived state, Firestore streams | ~30 min |
 | Zone list | `lib/screens/zones/zone_list_screen.dart` | ListView.builder, data grouping, confirmation dialogs | ~45 min |
+
+## Quick Install (Debug APK)
+
+Download the debug APK from the [latest GitHub release](../../releases/latest) and install on any Android device. No Play Store required.
 
 ## Setup
 

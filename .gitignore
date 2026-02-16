@@ -29,3 +29,4 @@ analysis_options.yaml
 
 # Workflow archives (optional - uncomment to ignore)
 # workflow/**/.archived/
+mialarm-geofence-debug.apk
