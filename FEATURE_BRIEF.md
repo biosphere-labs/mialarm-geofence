@@ -2,7 +2,7 @@
 
 ## What This Is
 
-A functional Flutter clone of Finmon's **miAlarm** app with an added **geofencing auto-arm/disarm** feature — a capability that key South African competitors already offer but miAlarm currently lacks. Select sections were intentionally implemented by hand as a Flutter learning exercise.
+A functional Flutter clone of Finmon's **miAlarm** app with an added **geofencing auto-arm/disarm** feature — a capability that competitors like Ajax already offer but miAlarm currently lacks. Select sections were intentionally implemented by hand as a Flutter learning exercise.
 
 ## The App
 
@@ -61,12 +61,11 @@ The system tracks all family members' presence. It only arms when the **last per
 
 | Company | App | Geofencing |
 |---------|-----|-----------|
-| **RDC** | pod | Yes — "Limit access automation to a close proximity with geofencing limits" |
-| **IDS** | hyyp+ | Yes — auto-arm/disarm with geofence zones |
-| **Ajax** | Ajax PRO | Yes — built into their security ecosystem |
+| **Ajax** | Ajax PRO | Yes — geofence reminders for arming/disarming |
+| **IDS** | hyyp+ | Not documented in official sources |
 | **Finmon** | miAlarm | **No** — manual arm/disarm only |
 
-Finmon's miAlarm offers manual arm/disarm from the app, which was impressive when launched. But the market has moved on. Geofencing is now table stakes for a premium security app in South Africa.
+Ajax Systems' app includes a documented geofence function that sends reminders when leaving/entering a user-defined area. Finmon's miAlarm offers manual arm/disarm from the app, but the market is moving toward location-aware automation.
 
 ### South African Context
 
@@ -76,7 +75,7 @@ South Africa has one of the highest private security adoption rates in the world
 
 - **Reduced false alarms** → Lower operational cost for monitoring partners
 - **Increased app engagement** → Users interact with the app more when it's proactive
-- **Competitive parity** → Matches pod and hyyp+ feature sets
+- **Competitive parity** → Matches Ajax's geofencing capability
 - **Upsell opportunity** → Geofencing could be a premium subscription feature
 - **Differentiation** — Multi-user presence tracking (arm when *last* person leaves) is more sophisticated than most competitors' single-user implementations
 

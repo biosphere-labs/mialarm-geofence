@@ -2,7 +2,7 @@
 
 A functional Flutter clone of Finmon's miAlarm app with an added geofencing auto-arm/disarm feature. Built as a portfolio piece demonstrating Flutter, Firebase, and domain knowledge in the South African alarm monitoring industry.
 
-Geofencing is a feature that competitors (pod, hyyp+, Ajax) already offer but miAlarm currently lacks. See [FEATURE_BRIEF.md](FEATURE_BRIEF.md) for the full business case.
+Geofencing is a feature that competitors like Ajax already offer but miAlarm currently lacks. See [FEATURE_BRIEF.md](FEATURE_BRIEF.md) for the full business case.
 
 ## What It Does
 
